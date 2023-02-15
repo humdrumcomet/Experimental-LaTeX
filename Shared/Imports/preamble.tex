@@ -1,0 +1,262 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% LOAD PACKAGES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{geometry} % useful for defining page geometries
+\usepackage{hyperref} % used for creating hyperlinks in documents. Both to the web and within the document itself
+\usepackage[mode=build, subpreambles=false]{standalone} % for using the standalone package for import
+\makeatletter
+\@ifclassloaded{beamer}{
+  \typeout{
+    -------------------------------------------------
+    -------------------------------------------------
+    this file is a beamer file, skipping AMS packages
+    -------------------------------------------------
+    -------------------------------------------------
+  }
+}{
+  \typeout{
+    ----------------------------------------------------
+    ----------------------------------------------------
+    this file is not a beamer file, loading AMS packages
+    ----------------------------------------------------
+    ----------------------------------------------------
+  }
+  \usepackage[tbtags]{amsmath} % for typesetting math (American Mathematical Society)
+  \usepackage{amsfonts} % fonts and mathematical symbols
+  \usepackage{amssymb} % more mathematical symbols
+}
+\makeatother
+% These packages aren't needed when compiling under LuaLaTeX
+% \usepackage[utf8]{inputenc} % how to treat the written file (as utf8)
+% \usepackage{morewrites} % important because with the glossaries, latex can use up its own hardcoded limit of files it can write out
+% \usepackage[T1]{fontenc} % the encoding for the output file T1 is the most common, includes accents and many other commonly needed/used characters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[style=ieee,backend=biber]{biblatex} % for handling bibliographies
+\usepackage{float} % added control over
+\usepackage{graphicx} % tools for inclusion of graphics
+\usepackage{booktabs} % adding commands to improve the look of tables
+\usepackage{csvsimple} % simplify table creation by importing .csv files directly
+\usepackage{siunitx} % consistent notation and correct formatting of units
+\usepackage{minted} % inclusion of code blocks with syntax highlighting and
+\usepackage{xcolor} % to access the named colour LightGray
+\usepackage{chemformula} % for writing chemical formulae
+\usepackage[useregional]{datetime2} % facilitate date and time typesetting
+\usepackage{catchfilebetweentags} % taking elements from between tags
+\usepackage[debug, toc, section=section, acronym, symbols]{glossaries} % Glossaries package
+\usepackage{tikz} % to produce tikz vector graphics images in your document
+\usepackage{pgfplots} % to produce tikz/pgf vector graphic plots within your document
+\usepackage[siunitx,american voltages, american currents, RPvoltages]{circuitikz} % circuits with tikz
+\usepackage{hologo}
+\usepackage{luacode}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% PACKAGE SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% minted
+\definecolor{LightGray}{gray}{0.9}
+\colorlet{PresentationBlack}{black!2}
+\setminted{linenos=false, autogobble, fontsize=\tiny, breaklines=true, bgcolor=LightGray, breakbefore=\{} % global default options for minted
+\setmintedinline{bgcolor={}, fontsize=\small} % global default options for inline minted
+
+% tikz
+\usetikzlibrary{math, arrows, circuits.ee.IEC, positioning, shapes.arrows, shapes.geometric, automata, fadings, overlay-beamer-styles}
+\usepackage[draft]{tikzpeople}
+
+% pgfplots
+\pgfplotsset{compat=newest, compat/show suggested version=false}
+\usepgfplotslibrary{groupplots}
+
+% siunitx
+\sisetup{
+detect-family = true,
+detect-weight = true,
+per-mode = reciprocal,
+input-digits = { 0123456789\pi\dots },
+input-comparators = { <=>\approx\ge\geq\gg\le\leq\ll\sim\gtrsim\lesssim },
+table-auto-round,
+table-align-comparator = true,
+}%
+\DeclareSIUnit{\torr}{Torr} % Custom unit definition
+
+% Bibliography .bib file location
+\addbibresource[location=local]{\bibPath/references.bib}
+
+% Add Constants list using glossary
+\newglossary[cgls]{constants}{cstog}{cstig}{Constants}
+
+% Alphabetize glossary and acronyms list
+\makeglossaries
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% ADDITIONAL SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A command for less cramped nested fractions
+\newcommand\ddfrac[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+
+% Front matter, main matter, and back matter definitions (not needed for document class book or memoire)
+\def\frontmatter{%
+ \pagenumbering{roman}
+ \setcounter{page}{1}
+ \renewcommand{\thesection}{\roman{section}}
+}%
+\def\mainmatter{%
+ \pagenumbering{arabic}
+ \setcounter{page}{1}
+ \setcounter{section}{0}
+ \renewcommand{\thesection}{\arabic{section}}
+}%
+\def\backmatter{%
+ \setcounter{section}{0}
+ \renewcommand{\thesection}{\alph{section}}
+}%
+
+% taken from tikz  manual v3.1.10 sec. 106.5.3 Command for declaring new shapes pg 1149
+\makeatletter
+\pgfdeclareshape{document}{
+\inheritsavedanchors[from=rectangle] % this is nearly a rectangle
+\inheritanchorborder[from=rectangle]
+\inheritanchor[from=rectangle]{center}
+\inheritanchor[from=rectangle]{north}
+\inheritanchor[from=rectangle]{south}
+\inheritanchor[from=rectangle]{west}
+\inheritanchor[from=rectangle]{east}
+% ... and possibly more
+\backgroundpath{% this is new
+% store lower right in xa/ya and upper right in xb/yb
+\southwest \pgf@xa=\pgf@x \pgf@ya=\pgf@y
+\northeast \pgf@xb=\pgf@x \pgf@yb=\pgf@y
+% compute corner of ‘‘flipped page’’
+\pgf@xc=\pgf@xb \advance\pgf@xc by-10pt % this should be a parameter
+\pgf@yc=\pgf@yb \advance\pgf@yc by-10pt
+% construct main path
+\pgfpathmoveto{\pgfpoint{\pgf@xa}{\pgf@ya}}
+\pgfpathlineto{\pgfpoint{\pgf@xa}{\pgf@yb}}
+\pgfpathlineto{\pgfpoint{\pgf@xc}{\pgf@yb}}
+\pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yc}}
+\pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@ya}}
+\pgfpathclose
+% add little corner
+\pgfpathmoveto{\pgfpoint{\pgf@xc}{\pgf@yb}}
+\pgfpathlineto{\pgfpoint{\pgf@xc}{\pgf@yc}}
+\pgfpathlineto{\pgfpoint{\pgf@xb}{\pgf@yc}}
+\pgfpathlineto{\pgfpoint{\pgf@xc}{\pgf@yc}}
+}
+}
+\makeatother
+
+% Taken from TeX SE https://tex.stackexchange.com/questions/103688/folded-paper-shape-tikz
+\tikzstyle{doc}=[%
+draw,
+thick,
+align=center,
+color=black,
+shape=document,
+minimum width=20mm,
+minimum height=28.2mm,
+shape=document,
+inner sep=2ex,
+% text width=10mm,
+]
+
+%Get rounded wire jumps
+\tikzset{
+    declare function={% in case of CVS which switches the arguments of atan2
+        atan3(\a,\b)=ifthenelse(atan2(0,1)==90, atan2(\a,\b), atan2(\b,\a));},
+        kinky cross radius/.initial=+.125cm,
+        @kinky cross/.initial=+, kinky crosses/.is choice,
+        kinky crosses/left/.style={@kinky cross=-},kinky crosses/right/.style={@kinky cross=+},
+        kinky cross/.style args={(#1)--(#2)}{
+        to path={
+          let \p{@kc@}=($(\tikztotarget)-(\tikztostart)$),
+              \n{@kc@}={atan3(\p{@kc@})+180} in
+          -- ($(intersection of \tikztostart--{\tikztotarget} and #1--#2)!%
+                 \pgfkeysvalueof{/tikz/kinky cross radius}!(\tikztostart)$)
+          arc [ radius     =\pgfkeysvalueof{/tikz/kinky cross radius},
+                start angle=\n{@kc@},
+                delta angle=\pgfkeysvalueof{/tikz/@kinky cross}180 ]
+          -- (\tikztotarget)}},
+    onslide/.code args={<#1>#2}{%
+        \only<#1>{\pgfkeysalso{#2}} % \pgfkeysalso doesn't change the path
+    },
+    myfading/.style n args={2}{
+        postaction={
+            decorate,
+            decoration={
+                markings,
+                mark=between positions 0 and \pgfdecoratedpathlength-4pt step 0.2pt with {
+                    \pgfmathsetmacro\myval{
+                            multiply(
+                                divide(
+                                    \pgfkeysvalueof{/pgf/decoration/mark info/distance from start},
+                                    \pgfdecoratedpathlength
+                                ),
+                                100
+                            )
+                    };
+                    \pgfsetfillcolor{#2!\myval!#1};
+                    \pgfpathcircle{\pgfpointorigin}{\pgflinewidth};
+                    \pgfusepath{fill};
+                },
+                mark=at position 1 with {\arrow[#2, >=latex, auto]{>}},
+            }
+        }
+    },
+}
+\usepackage[most]{tcolorbox}
+\usepackage{tikzpagenodes}
+
+\def\myblur{4}
+
+\makeatletter
+\newtcolorbox{blur}[1][]{%
+  #1,
+  enhanced,
+  remember,
+  frame hidden,
+  interior hidden,
+  fonttitle=\bfseries,
+  coltitle=black,
+  underlay={
+    \begin{tcbclipframe}
+      \begin{scope}[remember picture,overlay,inner sep=0pt]
+        \fill[white] (current page.south west) rectangle (current page.north east);
+        \foreach \x in {-10,-7.5,...,10}{
+        \foreach \y in {-10,-7.5,...,10}{
+          \node[opacity=0.01] at ([yshift=\y,xshift=\x]current page.center) {\includestandalone[mode=tex, width=\textwidth]{\assetPath/Images/Tikz/texfamilytree/texfamilytree}};
+        }}
+      \end{scope}
+    \end{tcbclipframe}
+   }
+}
+\makeatother
+
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+
+% For using the standalone package and conditionally typesetting bibliography and glossaries
+\newboolean{standaloneFlag}
+\setboolean{standaloneFlag}{true}
+% Create command to conditionally typeset a bibliography.
+\newcommand{\standaloneBib}{%%
+  \ifthenelse{\boolean{standaloneFlag}}{
+    \clearpage
+    \printbibliography[heading=bibintoc]
+    \printglossary[type=symbols]
+    \printglossary[type=constants]
+    \printglossary[type=acronymtype]
+    \printglossary[type=main]
+  }{}}
+
+% Code for Lua search and Replace
+
+\directlua{
+    path = "\luacodePath"
+    demo = require(path.."/searchandreplace")
+}
+\newcommand\luastringsubs[3]{%
+    \directlua{
+        replacementsPreTable = [[\unexpanded{#1}]]
+        filePathIn = [[#2]]
+        filePathOut = [[#3]]
+        subbedString = stringReplaceFromFile(replacementsPreTable, filePathIn, filePathOut)
+    }%
+}

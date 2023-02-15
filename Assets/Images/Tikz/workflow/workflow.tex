@@ -1,0 +1,49 @@
+% arara: lualatex: { shell: true}
+% arara: lualatex: { shell: true}
+
+\providecommand{\toplevel}{../../../..}
+\providecommand{\importPath}{\toplevel/Shared/Imports}
+\providecommand{\assetPath}{\toplevel/Assets}
+\providecommand{\sharedPath}{\toplevel/Shared}
+
+\documentclass[tikz, hidelinks, float=false, crop=false]{standalone}
+
+\input{\importPath/preamble}
+\input{\importPath/glossary}
+\input{\importPath/symbols}
+
+\begin{document}
+    \begin{tikzpicture}[thick]
+        \draw (0,0) node[alice, minimum size=1.5cm](user){};
+        \draw (user) ++(6,-2) node(appStart){};
+        \draw (user.south) ++(0.5,0) node(userhold){};
+        \draw[visible on=<{1,4-}>] (appStart) ++(-2,0) node[rectangle, draw, minimum width=1cm, align=center] (app1){App1};
+        \draw[visible on=<{1-3,7-}>] (appStart) ++(-0.66,0) node[rectangle, draw, minimum width=1cm, align=center] (app2){App2};
+        \draw (appStart) ++(0.66,0) node[rectangle, draw, minimum width=1cm, align=center] (app3){App3};
+        \draw (appStart) ++(2,0) node[rectangle, draw, minimum width=1cm, align=center] (app4){App4};
+        \draw (appStart) ++(0,-1) node[rectangle, draw, minimum width=5cm, align=center] (os){Operating System\&\\ Desktop Environment};
+        \draw (os) ++(0,-1) node[rectangle, draw,  minimum width=5cm] (computer){Computer};
+        % App 1 in use
+        \draw[visible on=<2-3>] (appStart) ++(-2,2) node[rectangle, draw, minimum width=1cm, align=center] (app1){App1};
+        \draw[visible on=<2-3>, dashed](app1) -- (app1 |- os.north);
+        \draw[visible on=<2>] (user) ++(2,2) node[doc, minimum width=0.5cm, minimum height=1cm](in){In};
+        \draw[visible on=<2>] (user) to [bend left] (in);
+        \draw[visible on=<2>, ->, >=Stealth] (in) to [bend left] (app1);
+
+        \draw[visible on=<3>] (user) ++(2,-2) node[doc, minimum width=0.5cm, minimum height=1cm](out){Out1};
+        \draw[visible on=<3>, ->, >=Stealth] (out) to [bend left] (userhold);
+        \draw[visible on=<3>] (app1) to [bend left] (out);
+
+        % App 2 in use
+        \draw[visible on=<4-6>] (appStart) ++(-0.66,2) node[rectangle, draw, minimum width=1cm, align=center] (app2){App2};
+        \draw[visible on=<4-6>, dashed](app2) -- (app2 |- os.north);
+        \draw[visible on=<4>] (userhold) node[doc, minimum width=0.5cm, minimum height=1cm, fill=white](out1hold){Out1};
+        \draw[visible on=<5>] (user) ++(3,2) node[doc, minimum width=0.5cm, minimum height=1cm, fill=white](out1in){Out1};
+        \draw[visible on=<5>] (user) to [bend left] (out1in);
+        \draw[visible on=<5>, ->, >=Stealth] (out1in) to [bend left] (app2);
+        \draw[visible on=<6>] (user) ++(3,-1) node[doc, minimum width=0.5cm, minimum height=1cm, fill=white](out2){Out2};
+        \draw[visible on=<6>, ->, >=Stealth] (out2) to [bend left] (user.east);
+        \draw[visible on=<6>] (app2) to [bend left] (out2);
+        \draw[visible on=<7>] (userhold) node[doc, minimum width=0.5cm, minimum height=1cm, fill=white](out2hold){Out2};
+    \end{tikzpicture}
+\end{document}
